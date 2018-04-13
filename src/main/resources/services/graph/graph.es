@@ -10,57 +10,59 @@ import {request as httpClientRequest} from '/lib/http-client';
 import {CT_JSON} from '../../lib/microsoftGraph/contentType.es';
 
 import {applyProxy} from '../../lib/microsoftGraph/util/applyProxy.es';
-import {decodeAccessToken} from '../../lib/microsoftGraph/util/decodeAccessToken.es';
 import {deepen} from '../../lib/microsoftGraph/util/deepen.es';
 import {jsonError} from '../../lib/microsoftGraph/util/jsonError.es';
 import {sortObject} from '../../lib/microsoftGraph/util/sortObject.es';
 import {toStr} from '../../lib/microsoftGraph/util/toStr.es';
-
+import {get as getToken} from '../token/token.es';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Exported functions
 //──────────────────────────────────────────────────────────────────────────────
 export function get(request) {
-    const {userStore} = request.params;
+    const {body, resource, userStore} = request.params;
+    let {authorization} = request.params;
+    if (!resource) {
+        return jsonError('Url parameter resource must be present!');
+    }
     if (!userStore) {
         return jsonError('Url parameter userStore must be present!');
     }
+    if (!authorization) {
+        const tokenResponse = getToken({params: { userStore }});
+        log.debug(toStr({tokenResponse}));
+        authorization = `${tokenResponse.body.token_type} ${tokenResponse.body.access_token}`;
+    }
+    const path = request.params.path || 'v1.0';
+    const method = request.params.method || 'GET';
     const config = sortObject(deepen(app.config)[userStore]);
     const requestParams = {
         contentType: CT_JSON,
-        method: 'POST',
-        params: {
-            client_id: config.client.id,
-            client_secret: config.client.secret,
-            grant_type: 'client_credentials',
-            scope: config.scope
+        headers: {
+            Authorization: authorization
         },
-        url: config.tokenUrl
+        method,
+        url: `${config.host}/${path}/${resource}`
     };
+    if (body) { requestParams.body = body; }
     applyProxy(config, requestParams);
     log.debug(toStr({requestParams}));
 
-    const tokenResponse = httpClientRequest(requestParams);
-    log.debug(toStr({tokenResponse}));
+    const graphResponse = httpClientRequest(requestParams);
+    log.debug(toStr({graphResponse}));
 
-    const obj = JSON.parse(tokenResponse.body);
-    tokenResponse.body = obj;
-    const jwt = decodeAccessToken(obj.access_token); // log.info(`jwt:${toStr(jwt)}`);
-    tokenResponse.body.jwt = {
-        //header: jwt.header,
-        payload: jwt.payload
-        //signature: jwt.signature // Signature has binary chars not good for logging.
-    };
-    log.debug(toStr({tokenResponse}));
+    const obj = JSON.parse(graphResponse.body);
+    graphResponse.body = obj;
+    log.debug(toStr({graphResponse}));
 
-    return tokenResponse;
+    return graphResponse;
 
     /*return {
         body: {
             userStore,
             config,
             requestParams,
-            tokenResponse
+            graphResponse
         },
         contentType: CT_JSON
     };*/
