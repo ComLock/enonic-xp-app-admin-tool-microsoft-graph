@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "json-stringify-safe": "^5.0.1",
-    "render-js": "^1.22.0"
+    "render-js": "^1.22.0",
+    "uri-parse": "0.0.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

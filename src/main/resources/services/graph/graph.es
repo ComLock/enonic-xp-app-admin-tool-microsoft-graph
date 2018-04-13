@@ -20,7 +20,9 @@ import {get as getToken} from '../token/token.es';
 // Exported functions
 //──────────────────────────────────────────────────────────────────────────────
 export function get(request) {
-    const {body, resource, userStore} = request.params;
+    const {
+        body, resource, select, skipToken, top, userStore
+    } = request.params;
     let {authorization} = request.params;
     if (!resource) {
         return jsonError('Url parameter resource must be present!');
@@ -44,6 +46,12 @@ export function get(request) {
         method,
         url: `${config.host}/${path}/${resource}`
     };
+    if (select || skipToken || top) {
+        if (!requestParams.params) { requestParams.params = {}; }
+        if (select) { requestParams.params.$select = select; }
+        if (skipToken) { requestParams.params.$skipToken = skipToken; }
+        if (top) { requestParams.params.$top = top; }
+    }
     if (body) { requestParams.body = body; }
     applyProxy(config, requestParams);
     log.debug(toStr({requestParams}));
@@ -56,14 +64,4 @@ export function get(request) {
     log.debug(toStr({graphResponse}));
 
     return graphResponse;
-
-    /*return {
-        body: {
-            userStore,
-            config,
-            requestParams,
-            graphResponse
-        },
-        contentType: CT_JSON
-    };*/
 } // export function get
