@@ -33,6 +33,7 @@ module.exports = {
                 exports: 'never',
                 functions: 'ignore'
             }],
+            'function-paren-newline': ['off'],
             'import/extensions': ['off'],
             'import/prefer-default-export': ['off'],
             'import/no-absolute-path': ['off'],
