@@ -1,8 +1,8 @@
-<?xml version="1.0"?>
+<?xml version="1.0" standalone="yes"?>
 <tool xmlns="urn:enonic:xp:model:1.0">
   <display-name>Microsoft Graph Admin</display-name>
   <description>Microsoft Graph Admin tool</description>
   <allow>
-    <principal>role:system.admin.login</principal>
+    <principal>role:system.admin</principal>
   </allow>
 </tool>

@@ -1,13 +1,28 @@
+//──────────────────────────────────────────────────────────────────────────────
+// Node modules (resolved and bundled by webpack)
+//──────────────────────────────────────────────────────────────────────────────
 import {
-    doctype, html, head, body, main, h1, h2, pre, p, style,
+    doctype, html, head, body, main, h1, h2, ul, li, a, pre, p, style,
     build, access, clone, render
 } from 'render-js/src/class.es';
 
 
-import {graphSvg} from '/lib/microsoftGraph/svg/graph.es';
-import {toStr} from '/lib/microsoftGraph/util/toStr.es';
+//──────────────────────────────────────────────────────────────────────────────
+// Enonic XP libs (in jar file, resolved runtime)
+//──────────────────────────────────────────────────────────────────────────────
+import {serviceUrl as getServiceUrl} from '/lib/xp/portal';
 
 
+//──────────────────────────────────────────────────────────────────────────────
+// App libs (transpiled to /build and resolved runtime)
+//──────────────────────────────────────────────────────────────────────────────
+import {graphSvg} from '../../../lib/microsoftGraph/svg/graph.es';
+import {toStr} from '../../../lib/microsoftGraph/util/toStr.es';
+
+
+//──────────────────────────────────────────────────────────────────────────────
+// Static content
+//──────────────────────────────────────────────────────────────────────────────
 const VIEW = [
     doctype(),
     html({
@@ -25,7 +40,13 @@ const VIEW = [
                     }
                 }, [
                     graphSvg({height: 30}),
-                    'Microsoft Graph Admin'
+                    '&nbsp;Microsoft Graph Admin'
+                ]),
+                h2('Services:'),
+                ul([
+                    li(a({
+                        href: null//getServiceUrl({service: 'token'}) // TODO Build issue
+                    }, 'token'))
                 ]),
                 h2('com.enonic.app.admintool.microsoft.graph.cfg'),
             ])
@@ -35,20 +56,10 @@ const VIEW = [
 build(VIEW); // Build styling on static content
 
 
-export function get() {
-    const dom = clone(VIEW);
-
-    const ordered = {};
-    Object.keys(app.config).sort().forEach((key) => {
-        ordered[key] = app.config[key];
-    });
-
-    access(dom, 'html.body.main')
-        .addContent(pre(toStr(ordered)))
-        .addContent([
-            h2('Application configuration file syntax example'),
-            p('Replace anything marked with <>'),
-            pre(`<userStore>.clientId = <clientId>
+const EXAMPLE = [
+    h2('Application configuration file syntax example'),
+    p('Replace anything marked with <>'),
+    pre(`<userStore>.clientId = <clientId>
 <userStore>.clientSecret = <clientSecret>
 
 # * * * * * *
@@ -91,9 +102,27 @@ export function get() {
 
 <userStore>.resources = aboutMe, responsibilities, skills
 <userStore>.scope = https://graph.microsoft.com/.default
-<userStore>.tokenUrl = https://login.microsoftonline.com/<tenant>/v2.0/oauth/token`.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            )
-        ]);
+<userStore>.tokenUrl = https://login.microsoftonline.com/<tenant>/v2.0/oauth/token`
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+    ) // pre
+]; // EXAMPLE
+
+
+//──────────────────────────────────────────────────────────────────────────────
+// Dynamic content
+//──────────────────────────────────────────────────────────────────────────────
+export function get() {
+    const dom = clone(VIEW);
+
+    const ordered = {};
+    Object.keys(app.config).sort().forEach((key) => {
+        ordered[key] = app.config[key];
+    });
+
+    access(dom, 'html.body.main')
+        .addContent(pre(toStr(ordered)))
+        .addContent(EXAMPLE);
 
     // Since pageContributions don't work inline it right away.
     access(dom, 'html.head').addContent(

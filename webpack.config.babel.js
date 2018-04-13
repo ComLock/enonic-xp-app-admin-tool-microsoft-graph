@@ -54,6 +54,8 @@ const SERVER_JS_CONFIG = {
         /\/lib\/(enonic|xp)/
     ],
     devtool: false, // Don't waste time generating sourceMaps
+    //mode: 'production',
+    mode: 'development',
     module: {
         rules: [{
             test: /\.(es6?|js)$/, // Will need js for node module depenencies
@@ -82,8 +84,7 @@ const SERVER_JS_CONFIG = {
     }, // output
     resolve: {
         alias: {
-            '/lib': path.resolve(__dirname, SRC_DIR, 'lib'),
-            '/site': path.resolve(__dirname, SRC_DIR, 'site'),
+            //'/lib': path.resolve(__dirname, SRC_DIR, 'lib'),
             '/services': path.resolve(__dirname, SRC_DIR, 'services')
         },
         extensions
