@@ -51,7 +51,7 @@ const SERVER_JS_CONFIG = {
     context,
     entry: SERVER_JS_ENTRY,
     externals: [
-        /\/lib\/(enonic|xp)/
+        /\/lib\/(enonic|http-client|text-encoding|xp)/
     ],
     devtool: false, // Don't waste time generating sourceMaps
     //mode: 'production',
@@ -88,7 +88,16 @@ const SERVER_JS_CONFIG = {
             '/services': path.resolve(__dirname, SRC_DIR, 'services')
         },
         extensions
-    } // resolve
+    }, // resolve
+    stats: {
+        colors: true,
+        hash: false,
+        maxModules: 0,
+        modules: false,
+        moduleTrace: false,
+        timings: false,
+        version: false
+    }
 };
 //console.log(`SERVER_JS_CONFIG:${JSON.stringify(SERVER_JS_CONFIG, null, 4)}`);
 

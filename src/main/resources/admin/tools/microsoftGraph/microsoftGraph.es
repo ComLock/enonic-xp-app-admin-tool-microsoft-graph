@@ -10,13 +10,15 @@ import {
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (in jar file, resolved runtime)
 //──────────────────────────────────────────────────────────────────────────────
-import {serviceUrl as getServiceUrl} from '/lib/xp/portal';
+//import {serviceUrl as getServiceUrl} from '/lib/xp/portal';
 
 
 //──────────────────────────────────────────────────────────────────────────────
 // App libs (transpiled to /build and resolved runtime)
 //──────────────────────────────────────────────────────────────────────────────
 import {graphSvg} from '../../../lib/microsoftGraph/svg/graph.es';
+import {deepen} from '../../../lib/microsoftGraph/util/deepen.es';
+import {sortObject} from '../../../lib/microsoftGraph/util/sortObject.es';
 import {toStr} from '../../../lib/microsoftGraph/util/toStr.es';
 
 
@@ -59,8 +61,8 @@ build(VIEW); // Build styling on static content
 const EXAMPLE = [
     h2('Application configuration file syntax example'),
     p('Replace anything marked with <>'),
-    pre(`<userStore>.clientId = <clientId>
-<userStore>.clientSecret = <clientSecret>
+    pre(`<userStore>.client.id = <clientId>
+<userStore>.client.secret = <clientSecret>
 
 # * * * * * *
 # | | | | | |
@@ -95,10 +97,10 @@ const EXAMPLE = [
 <userStore>.profile.mapping.<scope>.surname = surname
 <userStore>.profile.mapping.<scope>.userPrincipalName = userPrincipalName
 
-<userStore>.proxyHost = <example.com>
-<userStore>.proxyPassword = <whatever>
-<userStore>.proxyPort = <port number>
-<userStore>.proxyUser = <username>
+<userStore>.proxy.host = <example.com>
+<userStore>.proxy.password = <whatever>
+<userStore>.proxy.port = <port number>
+<userStore>.proxy.user = <username>
 
 <userStore>.resources = aboutMe, responsibilities, skills
 <userStore>.scope = https://graph.microsoft.com/.default
@@ -115,13 +117,13 @@ const EXAMPLE = [
 export function get() {
     const dom = clone(VIEW);
 
-    const ordered = {};
+    /*const ordered = {};
     Object.keys(app.config).sort().forEach((key) => {
         ordered[key] = app.config[key];
-    });
+    });*/
 
     access(dom, 'html.body.main')
-        .addContent(pre(toStr(ordered)))
+        .addContent(pre(toStr(sortObject(deepen(app.config)))))
         .addContent(EXAMPLE);
 
     // Since pageContributions don't work inline it right away.
