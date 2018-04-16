@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "deepmerge": "^2.1.0",
     "json-stringify-safe": "^5.0.1",
     "render-js": "^1.22.0",
     "uri-parse": "0.0.2"

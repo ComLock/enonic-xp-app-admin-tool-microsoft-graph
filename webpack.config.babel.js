@@ -4,6 +4,8 @@
 //──────────────────────────────────────────────────────────────────────────────
 import glob from 'glob';
 import path from 'path';
+/*import PolyfillsPlugin from 'webpack-polyfills-plugin';
+import PolyfillInjectorPlugin from 'webpack-polyfill-injector';*/
 
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -70,6 +72,7 @@ const SERVER_JS_CONFIG = {
                         'array-includes',
                         'optimize-starts-with',
                         'transform-object-assign',
+                        //'transform-es2017-object-entries', // Destroys imports?
                         'transform-object-rest-spread'
                     ],
                     presets: ['es2015']
@@ -82,6 +85,16 @@ const SERVER_JS_CONFIG = {
         filename: '[name].js',
         libraryTarget: 'commonjs'
     }, // output
+    plugins: [
+        /*new PolyfillInjectorPlugin({
+            polyfills: [
+                'Object.values'
+            ]
+        })
+        new PolyfillsPlugin([
+            'Object/values'
+        ])*/
+    ],
     resolve: {
         alias: {
             //'/lib': path.resolve(__dirname, SRC_DIR, 'lib'),
