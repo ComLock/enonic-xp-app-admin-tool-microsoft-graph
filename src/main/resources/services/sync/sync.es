@@ -125,20 +125,21 @@ export function get(request) {
 
             if (config.resources) {
                 const resources = config.resources.replace(/ +/g, '').split(','); //log.debug(toStr({resources}));
-                resources.forEach((resource) => {
-                    const graphRequestParams = {
-                        params: {
-                            resource: `/users/${user.userPrincipalName}/${resource}`,
-                            userStore
-                        }
-                    }; //log.debug(toStr({graphRequestParams}));
-                    const graphResponse = graphRequest(graphRequestParams);
-                    if (graphResponse.status === 200 && graphResponse.body && graphResponse.body.value) {
-                        //log.info(toStr({graphResponse}));
-                        // Seen value types: Array and String.
-                        newProfile[resource] = graphResponse.body.value; // TODO HARDCODED profile location
+                const graphRequestParams = {
+                    params: {
+                        select: resources.join(','),
+                        resource: `/users/${user.userPrincipalName}`,
+                        userStore
                     }
-                }); // forEach resource
+                }; //log.debug(toStr({graphRequestParams}));
+                const graphResponse = graphRequest(graphRequestParams);
+                if (graphResponse.status === 200 && graphResponse.body) {
+                    resources.forEach((resource) => {
+                        if (graphResponse.body[resource]) {
+                            newProfile.graph[resource] = graphResponse.body[resource];
+                        }
+                    }); // forEach resource
+                }
             } // if config.resources
 
             const modifyProfileRes = modifyProfile({

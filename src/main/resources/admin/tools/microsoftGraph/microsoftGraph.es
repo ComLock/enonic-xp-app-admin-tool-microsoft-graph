@@ -86,16 +86,25 @@ const EXAMPLE = [
 
 <userStore>.photo = true
 
-<userStore>.profile.mapping.<scope>.country = country
-<userStore>.profile.mapping.<scope>.displayName = displayName
-<userStore>.profile.mapping.<scope>.givenName = givenName
-<userStore>.profile.mapping.<scope>.mail = mail
-<userStore>.profile.mapping.<scope>.mailNickname = mailNickname
-<userStore>.profile.mapping.<scope>.onPremisesDomainName = onPremisesDomainName
-<userStore>.profile.mapping.<scope>.onPremisesSamAccountName = onPremisesSamAccountName
-<userStore>.profile.mapping.<scope>.preferredLanguage = preferredLanguage
-<userStore>.profile.mapping.<scope>.surname = surname
-<userStore>.profile.mapping.<scope>.userPrincipalName = userPrincipalName
+# No scope:
+<userStore>.profile.mapping.key = value
+
+# Various scopes:
+<userStore>.profile.mapping.<scope>.key = value
+<userStore>.profile.mapping.<scope>.<nestedscope>.key = value
+<userStore>.profile.mapping.<anotherscope>.key = value
+
+# Examples:
+<userStore>.profile.mapping.country = country
+<userStore>.profile.mapping.displayName = displayName
+<userStore>.profile.mapping.givenName = givenName
+<userStore>.profile.mapping.mail = mail
+<userStore>.profile.mapping.mailNickname = mailNickname
+<userStore>.profile.mapping.onPremisesDomainName = onPremisesDomainName
+<userStore>.profile.mapping.onPremisesSamAccountName = onPremisesSamAccountName
+<userStore>.profile.mapping.preferredLanguage = preferredLanguage
+<userStore>.profile.mapping.surname = surname
+<userStore>.profile.mapping.userPrincipalName = userPrincipalName
 
 <userStore>.proxy.host = <example.com>
 <userStore>.proxy.password = <whatever>
