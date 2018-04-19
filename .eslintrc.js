@@ -53,6 +53,7 @@ module.exports = {
             'no-underscore-dangle': ['error', {
                 allow: [
                     '_id', // content-type property
+                    '_indexConfig', // node property
                     '_path', // content-type property
                     '_selected' // option-set property
                 ],

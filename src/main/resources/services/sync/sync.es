@@ -1,7 +1,7 @@
 //──────────────────────────────────────────────────────────────────────────────
 // Node modules (resolved and bundled by webpack)
 //──────────────────────────────────────────────────────────────────────────────
-import merge from 'deepmerge';
+//import merge from 'deepmerge';
 
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -15,7 +15,7 @@ import {
     modifyUser
 } from '/lib/xp/auth';
 import {sanitize} from '/lib/xp/common';
-
+import {connect} from '/lib/xp/node';
 
 //──────────────────────────────────────────────────────────────────────────────
 // App libs (transpiled to /build and resolved runtime)
@@ -31,6 +31,24 @@ import {isString} from '../../lib/microsoftGraph/util/isString.es';
 import {jsonError} from '../../lib/microsoftGraph/util/jsonError.es';
 //import {sortObject} from '../../lib/microsoftGraph/util/sortObject.es';
 import {toStr} from '../../lib/microsoftGraph/util/toStr.es';
+
+
+//──────────────────────────────────────────────────────────────────────────────
+// Private constants
+//──────────────────────────────────────────────────────────────────────────────
+const connection = connect({
+    repoId: 'system-repo',
+    branch: 'master'
+});
+
+const PROFILE_CONFIG = {
+    decideByType: true,
+    enabled: true,
+    nGram: true,
+    fulltext: true,
+    includeInAllText: true,
+    indexValueProcessors: []
+};
 
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -120,6 +138,28 @@ export function get(request) {
                 });
                 users[user.userPrincipalName] = createRes;
             } // if !principal
+
+            connection.modify({
+                key,
+                editor: (node) => {
+                    let hasProfileConfig = false;
+                    node._indexConfig.configs = node._indexConfig.configs.map((c) => { // eslint-disable-line no-param-reassign
+                        if (c.path === 'profile') {
+                            hasProfileConfig = true;
+                            c.config = PROFILE_CONFIG; // eslint-disable-line no-param-reassign
+                        }
+                        return c;
+                    }); // map
+                    if (!hasProfileConfig) {
+                        node._indexConfig.configs.push({
+                            path: 'profile',
+                            config: PROFILE_CONFIG
+                        });
+                    }
+                    return node;
+                } // editor
+            });
+
             //const currentProfile = getProfile({key}); log.debug(toStr({currentProfile}));
             const newProfile = buildprofile({mapping: config.profile.mapping, user}); //log.debug(toStr({newProfile}));
 
@@ -142,12 +182,14 @@ export function get(request) {
                 }
             } // if config.resources
 
+            // TODO Perhaps use deepdiff, lets trust Enonic for now.
             const modifyProfileRes = modifyProfile({
                 key,
-                editor: (currentProfile) => {
+                editor: () => newProfile /*(currentProfile) => { // eslint-disable-line no-unused-vars
+                    // NOTE deepmerge will keep duplicating array contents!
                     const updatedProfile = merge(currentProfile, newProfile); //log.info(toStr({updatedProfile}));
-                    return updatedProfile;
-                }
+                    return newProfile;
+                }*/
             }); //log.info(toStr({modifyProfileRes}));
             users[user.userPrincipalName].profile = modifyProfileRes; //getProfile({key});
         }); // forEach user
