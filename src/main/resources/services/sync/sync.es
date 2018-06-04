@@ -109,89 +109,93 @@ export function get(request) {
         r.body.value.forEach((user) => {
             const name = sanitize(user[config.mapping.name]);
             const key = `user:${userStore}:${name}`;
-            const displayName = user[config.mapping.displayName];
-            const email = user[config.mapping.email];
 
-            // Just returns null even though the user doesn't exist.
+            try {
+                const displayName = user[config.mapping.displayName];
+                const email = user[config.mapping.email];
 
-            const principal = getPrincipal(key); //log.debug(toStr({principal}));
-            if (principal) {
-                if (principal.displayName !== displayName || principal.email !== email) {
-                    const modifyUserRes = modifyUser({
-                        key,
-                        editor: (u) => {
-                            u.displayName = displayName; // eslint-disable-line no-param-reassign
-                            u.email = email; // eslint-disable-line no-param-reassign
-                            return u;
-                        }
-                    }); log.info(toStr({modifyUserRes}));
-                    users[user.userPrincipalName] = modifyUserRes;
+                // Just returns null even though the user doesn't exist.
+                const principal = getPrincipal(key); //log.debug(toStr({principal}));
+                if (principal) {
+                    if (principal.displayName !== displayName || principal.email !== email) {
+                        const modifyUserRes = modifyUser({
+                            key,
+                            editor: (u) => {
+                                u.displayName = displayName; // eslint-disable-line no-param-reassign
+                                u.email = email; // eslint-disable-line no-param-reassign
+                                return u;
+                            }
+                        }); log.info(toStr({modifyUserRes}));
+                        users[user.userPrincipalName] = modifyUserRes;
+                    } else {
+                        users[user.userPrincipalName] = principal;
+                    }
                 } else {
-                    users[user.userPrincipalName] = principal;
-                }
-            } else {
-                const createRes = createUser({
-                    displayName,
-                    email,
-                    name,
-                    userStore
-                });
-                users[user.userPrincipalName] = createRes;
-            } // if !principal
-
-            connection.modify({
-                key,
-                editor: (node) => {
-                    let hasProfileConfig = false;
-                    node._indexConfig.configs = node._indexConfig.configs.map((c) => { // eslint-disable-line no-param-reassign
-                        if (c.path === 'profile') {
-                            hasProfileConfig = true;
-                            c.config = PROFILE_CONFIG; // eslint-disable-line no-param-reassign
-                        }
-                        return c;
-                    }); // map
-                    if (!hasProfileConfig) {
-                        node._indexConfig.configs.push({
-                            path: 'profile',
-                            config: PROFILE_CONFIG
-                        });
-                    }
-                    return node;
-                } // editor
-            });
-
-            //const currentProfile = getProfile({key}); log.debug(toStr({currentProfile}));
-            const newProfile = buildprofile({mapping: config.profile.mapping, user}); //log.debug(toStr({newProfile}));
-
-            if (config.resources) {
-                const resources = config.resources.replace(/ +/g, '').split(','); //log.debug(toStr({resources}));
-                const graphRequestParams = {
-                    params: {
-                        select: resources.join(','),
-                        resource: `/users/${user.userPrincipalName}`,
+                    const createRes = createUser({
+                        displayName,
+                        email,
+                        name,
                         userStore
-                    }
-                }; //log.debug(toStr({graphRequestParams}));
-                const graphResponse = graphRequest(graphRequestParams);
-                if (graphResponse.status === 200 && graphResponse.body) {
-                    resources.forEach((resource) => {
-                        if (graphResponse.body[resource]) {
-                            newProfile.graph[resource] = graphResponse.body[resource];
-                        }
-                    }); // forEach resource
-                }
-            } // if config.resources
+                    }); log.info(toStr({createRes}));
+                    users[user.userPrincipalName] = createRes;
+                } // if !principal
 
-            // TODO Perhaps use deepdiff, lets trust Enonic for now.
-            const modifyProfileRes = modifyProfile({
-                key,
-                editor: () => newProfile /*(currentProfile) => { // eslint-disable-line no-unused-vars
-                    // NOTE deepmerge will keep duplicating array contents!
-                    const updatedProfile = merge(currentProfile, newProfile); //log.info(toStr({updatedProfile}));
-                    return newProfile;
-                }*/
-            }); //log.info(toStr({modifyProfileRes}));
-            users[user.userPrincipalName].profile = modifyProfileRes; //getProfile({key});
+                connection.modify({
+                    key,
+                    editor: (node) => {
+                        let hasProfileConfig = false;
+                        node._indexConfig.configs = node._indexConfig.configs.map((c) => { // eslint-disable-line no-param-reassign
+                            if (c.path === 'profile') {
+                                hasProfileConfig = true;
+                                c.config = PROFILE_CONFIG; // eslint-disable-line no-param-reassign
+                            }
+                            return c;
+                        }); // map
+                        if (!hasProfileConfig) {
+                            node._indexConfig.configs.push({
+                                path: 'profile',
+                                config: PROFILE_CONFIG
+                            });
+                        }
+                        return node;
+                    } // editor
+                });
+
+                //const currentProfile = getProfile({key}); log.debug(toStr({currentProfile}));
+                const newProfile = buildprofile({mapping: config.profile.mapping, user}); //log.debug(toStr({newProfile}));
+
+                if (config.resources) {
+                    const resources = config.resources.replace(/ +/g, '').split(','); //log.debug(toStr({resources}));
+                    const graphRequestParams = {
+                        params: {
+                            select: resources.join(','),
+                            resource: `/users/${user.userPrincipalName}`,
+                            userStore
+                        }
+                    }; //log.debug(toStr({graphRequestParams}));
+                    const graphResponse = graphRequest(graphRequestParams);
+                    if (graphResponse.status === 200 && graphResponse.body) {
+                        resources.forEach((resource) => {
+                            if (graphResponse.body[resource]) {
+                                newProfile.graph[resource] = graphResponse.body[resource];
+                            }
+                        }); // forEach resource
+                    }
+                } // if config.resources
+
+                // TODO Perhaps use deepdiff, lets trust Enonic for now.
+                const modifyProfileRes = modifyProfile({
+                    key,
+                    editor: () => newProfile /*(currentProfile) => { // eslint-disable-line no-unused-vars
+                        // NOTE deepmerge will keep duplicating array contents!
+                        const updatedProfile = merge(currentProfile, newProfile); //log.info(toStr({updatedProfile}));
+                        return newProfile;
+                    }*/
+                }); //log.info(toStr({modifyProfileRes}));
+                users[user.userPrincipalName].profile = modifyProfileRes; //getProfile({key});
+            } catch (e) {
+                log.error(`Something went wrong while processing user:${key} e:${e}`);
+            }
         }); // forEach user
     }); // forEach graphResponse
     const endTime = currentTimeMillis();
