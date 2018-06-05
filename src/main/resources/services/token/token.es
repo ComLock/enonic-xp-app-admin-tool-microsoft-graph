@@ -21,6 +21,7 @@ import {toStr} from '../../lib/microsoftGraph/util/toStr.es';
 // Exported functions
 //──────────────────────────────────────────────────────────────────────────────
 export function get(request) {
+    log.info('service/token.get()');
     const {userStore} = request.params;
     if (!userStore) {
         return jsonError('Url parameter userStore must be present!');
@@ -40,7 +41,9 @@ export function get(request) {
     applyProxy(config, requestParams);
     log.debug(toStr({requestParams}));
 
+    log.info('service/token.get() before httpClientRequest');
     const tokenResponse = httpClientRequest(requestParams);
+    log.info('service/token.get() after httpClientRequest');
     log.debug(toStr({tokenResponse}));
 
     const obj = JSON.parse(tokenResponse.body);

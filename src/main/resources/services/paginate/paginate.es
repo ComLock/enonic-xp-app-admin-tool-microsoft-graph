@@ -17,6 +17,7 @@ import {toStr} from '../../lib/microsoftGraph/util/toStr.es';
 // Exported functions
 //──────────────────────────────────────────────────────────────────────────────
 export function get(request) {
+    log.info('service/paginate.get()');
     if (!request.params.top) { request.params.top = 999; }
     const graphResponses = [];
     let pageNo = 0;
@@ -24,7 +25,9 @@ export function get(request) {
     while (more) {
         pageNo += 1;
         log.debug(toStr({request, pageNo}));
+        log.info('service/paginate.get() before graphRequest');
         const graphResponse = graphRequest(request);
+        log.info('service/paginate.get() after graphRequest');
         log.debug(toStr({graphResponse, pageNo}));
         graphResponses.push(graphResponse);
         if (graphResponse.body['@odata.nextLink']) {

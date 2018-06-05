@@ -20,6 +20,7 @@ import {get as getToken} from '../token/token.es';
 // Exported functions
 //──────────────────────────────────────────────────────────────────────────────
 export function get(request) {
+    log.info('service/graph.get()');
     const {
         body, resource, select, skipToken, top, userStore
     } = request.params;
@@ -31,7 +32,9 @@ export function get(request) {
         return jsonError('Url parameter userStore must be present!');
     }
     if (!authorization) {
+        log.info('service/graph.get() before getToken');
         const tokenResponse = getToken({params: { userStore }});
+        log.info('service/graph.get() after getToken');
         log.debug(toStr({tokenResponse}));
         authorization = `${tokenResponse.body.token_type} ${tokenResponse.body.access_token}`;
     }

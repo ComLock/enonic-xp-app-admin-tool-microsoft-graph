@@ -84,6 +84,7 @@ function buildprofile({mapping, user}) {
 // Exported functions
 //──────────────────────────────────────────────────────────────────────────────
 export function get(request) {
+    log.info('service/sync.get()');
     const startTime = currentTimeMillis();
     const {userStore} = request.params;
     if (!userStore) {
@@ -102,7 +103,10 @@ export function get(request) {
             userStore
         }
     }; //log.debug(toStr({requestParams}));
+
+    log.info('service/sync.get() before paginate');
     const usersRes = paginate(requestParams);
+    log.info('service/sync.get() after paginate');
     const users = {};
     // TODO Get list if users from Enonic and delete the ones that no longer exist in Graph
     usersRes.body.graphResponses.forEach((r) => {
@@ -173,7 +177,9 @@ export function get(request) {
                             userStore
                         }
                     }; //log.debug(toStr({graphRequestParams}));
+                    log.info('service/sync.get() before graphRequest');
                     const graphResponse = graphRequest(graphRequestParams);
+                    log.info('service/sync.get() after graphRequest');
                     if (graphResponse.status === 200 && graphResponse.body) {
                         resources.forEach((resource) => {
                             if (graphResponse.body[resource]) {
