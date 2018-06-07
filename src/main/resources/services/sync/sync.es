@@ -23,6 +23,8 @@ import {connect} from '/lib/xp/node';
 import {get as paginate} from '../paginate/paginate.es';
 import {get as graphRequest} from '../graph/graph.es';
 
+import getIsMaster from '../../lib/microsoftGraph/cluster/isMaster.es';
+
 import {CT_JSON} from '../../lib/microsoftGraph/contentType.es';
 
 import {currentTimeMillis} from '../../lib/microsoftGraph/util/currentTimeMillis.es';
@@ -84,7 +86,8 @@ function buildprofile({mapping, user}) {
 // Exported functions
 //──────────────────────────────────────────────────────────────────────────────
 export function get(request) {
-    log.info('service/sync.get()');
+    const isMaster = getIsMaster();
+    log.info(`service/sync.get() isMaster:${isMaster}`);
     const startTime = currentTimeMillis();
     const {userStore} = request.params;
     if (!userStore) {
@@ -207,6 +210,7 @@ export function get(request) {
     const endTime = currentTimeMillis();
     return {
         body: {
+            isMaster,
             userCount: users.length,
             time: `${endTime - startTime}ms`
             //users

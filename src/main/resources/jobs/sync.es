@@ -1,7 +1,11 @@
 import {run as runInContext} from '/lib/xp/context';
 import {get as sync} from '../services/sync/sync.es';
+import isMaster from '../lib/microsoftGraph/cluster/isMaster.es';
 
 export function run() {
+    if (!isMaster()) { // Only execute job on master
+        return;
+    }
     log.info('Starting sync service...');
     runInContext({
         branch: 'master',
