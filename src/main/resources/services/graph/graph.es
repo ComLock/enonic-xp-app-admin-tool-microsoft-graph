@@ -20,9 +20,9 @@ import {get as getToken} from '../token/token.es';
 // Exported functions
 //──────────────────────────────────────────────────────────────────────────────
 export function get(request) {
-    log.info('service/graph.get()');
+    //log.info('service/graph.get()');
     const {
-        body, resource, select, skipToken, top, userStore
+        body, resource, select, skiptoken, top, userStore
     } = request.params;
     let {authorization} = request.params;
     if (!resource) {
@@ -32,9 +32,9 @@ export function get(request) {
         return jsonError('Url parameter userStore must be present!');
     }
     if (!authorization) {
-        log.info('service/graph.get() before getToken');
+        //log.info('service/graph.get() before getToken');
         const tokenResponse = getToken({params: { userStore }});
-        log.info('service/graph.get() after getToken');
+        //log.info('service/graph.get() after getToken');
         log.debug(toStr({tokenResponse}));
         authorization = `${tokenResponse.body.token_type} ${tokenResponse.body.access_token}`;
     }
@@ -49,18 +49,19 @@ export function get(request) {
         method,
         url: `${config.host}/${path}/${resource}`
     };
-    if (select || skipToken || top) {
+    if (select || skiptoken || top) {
         if (!requestParams.params) { requestParams.params = {}; }
         if (select) { requestParams.params.$select = select; }
-        if (skipToken) { requestParams.params.$skipToken = skipToken; }
+        if (skiptoken) { requestParams.params.$skiptoken = skiptoken; }
         if (top) { requestParams.params.$top = top; }
     }
     if (body) { requestParams.body = body; }
     applyProxy(config, requestParams);
-    log.debug(toStr({requestParams}));
+    //log.info(toStr({requestParams})); // DEBUG
 
     const graphResponse = httpClientRequest(requestParams);
-    log.debug(toStr({graphResponse}));
+    //log.info(toStr({graphResponse})); // DEBUG
+    //throw new Error('DEBUG');
 
     const obj = JSON.parse(graphResponse.body);
     graphResponse.body = obj;

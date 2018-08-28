@@ -11,10 +11,12 @@ import {
     createUser,
     getPrincipal,
     //getProfile,
+    getUser,
     modifyProfile,
     modifyUser
 } from '/lib/xp/auth';
 import {sanitize} from '/lib/xp/common';
+import {get as getContext} from '/lib/xp/context';
 import {connect} from '/lib/xp/node';
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -88,6 +90,13 @@ function buildprofile({mapping, user}) {
 export function get(request) {
     const isMaster = getIsMaster();
     log.info(`service/sync.get() isMaster:${isMaster}`);
+
+    const context = getContext();
+    log.info(`service/sync.get() context:${toStr(context)}`);
+
+    const serviceUser = getUser();
+    log.info(`service/sync.get() serviceUser:${toStr(serviceUser)}`);
+
     const startTime = currentTimeMillis();
     const {userStore} = request.params;
     if (!userStore) {
@@ -107,9 +116,9 @@ export function get(request) {
         }
     }; //log.debug(toStr({requestParams}));
 
-    log.info('service/sync.get() before paginate');
+    //log.info('service/sync.get() before paginate');
     const usersRes = paginate(requestParams);
-    log.info('service/sync.get() after paginate');
+    //log.info('service/sync.get() after paginate');
     const users = {};
     // TODO Get list if users from Enonic and delete the ones that no longer exist in Graph
     usersRes.body.graphResponses.forEach((r) => {
@@ -138,12 +147,14 @@ export function get(request) {
                         users[user.userPrincipalName] = principal;
                     }
                 } else {
-                    const createRes = createUser({
+                    const createUserParams = {
                         displayName,
                         email,
                         name,
                         userStore
-                    }); log.info(toStr({createRes}));
+                    };
+                    //log.info(toStr({createUserParams}));
+                    const createRes = createUser(createUserParams); log.info(toStr({createRes}));
                     users[user.userPrincipalName] = createRes;
                 } // if !principal
 
@@ -180,9 +191,9 @@ export function get(request) {
                             userStore
                         }
                     }; //log.debug(toStr({graphRequestParams}));
-                    log.info('service/sync.get() before graphRequest');
+                    //log.info('service/sync.get() before graphRequest');
                     const graphResponse = graphRequest(graphRequestParams);
-                    log.info('service/sync.get() after graphRequest');
+                    //log.info('service/sync.get() after graphRequest');
                     if (graphResponse.status === 200 && graphResponse.body) {
                         resources.forEach((resource) => {
                             if (graphResponse.body[resource]) {
@@ -200,7 +211,7 @@ export function get(request) {
                         const updatedProfile = merge(currentProfile, newProfile); //log.info(toStr({updatedProfile}));
                         return newProfile;
                     }*/
-                }); //log.info(toStr({modifyProfileRes}));
+                }); log.info(toStr({modifyProfileRes}));
                 users[user.userPrincipalName].profile = modifyProfileRes; //getProfile({key});
             } catch (e) {
                 log.error(`Something went wrong while processing user:${key} e:${e}`);
