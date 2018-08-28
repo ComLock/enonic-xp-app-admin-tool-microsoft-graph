@@ -87,11 +87,9 @@ sourceSets {
 //task webpack(type:Exec) {
 //    commandLine 'npx'
 task webpack(type:NodeTask) {
-    script = file('node_modules/npx/index.js')
+    script = file('node_modules/webpack-cli/bin/cli.js')
     args = [
-        'webpack-cli',
-        '--color',
-        '--config', 'webpack.config.babel.js'
+        '--color'
     ]
 }
 webpack.dependsOn npmInstall
@@ -100,11 +98,9 @@ assemble.mustRunAfter webpack
 
 
 task watch(type:NodeTask) {
-    script = file('node_modules/npx/index.js')
+    script = file('node_modules/webpack-cli/bin/cli.js')
     args = [
-        'webpack-cli',
         '--color',
-        '--config', 'webpack.config.babel.js',
         '--watch'
     ]
 }
