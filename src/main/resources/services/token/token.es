@@ -28,6 +28,7 @@ export function get(request) {
     }
     const config = sortObject(deepen(app.config)[userStore]);
     const requestParams = {
+        connectionTimeout: config.connectionTimeout || 10000, // (number) The timeout on establishing the connection, in milliseconds. The default value is 10000.
         contentType: CT_JSON,
         method: 'POST',
         params: {
@@ -36,6 +37,7 @@ export function get(request) {
             grant_type: 'client_credentials',
             scope: config.scope
         },
+        readTimeout: config.readTimeout || 10000, // (number) The timeout on waiting to receive data, in milliseconds. The default value is 10000.
         url: config.tokenUrl
     };
     applyProxy(config, requestParams);
