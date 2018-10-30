@@ -4,6 +4,7 @@
 //──────────────────────────────────────────────────────────────────────────────
 import glob from 'glob';
 import path from 'path';
+import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
 /*import PolyfillsPlugin from 'webpack-polyfills-plugin';
 import PolyfillInjectorPlugin from 'webpack-polyfill-injector';*/
 
@@ -56,8 +57,8 @@ const SERVER_JS_CONFIG = {
         /\/lib\/(enonic|http-client|text-encoding|xp)/
     ],
     devtool: false, // Don't waste time generating sourceMaps
-    //mode: 'production',
-    mode: 'development',
+    mode: 'production',
+    //mode: 'development',
     module: {
         rules: [{
             test: /\.(es6?|js)$/, // Will need js for node module depenencies
@@ -70,16 +71,29 @@ const SERVER_JS_CONFIG = {
                     minified: false,
                     plugins: [
                         'array-includes',
-                        'optimize-starts-with',
-                        'transform-object-assign',
-                        //'transform-es2017-object-entries', // Destroys imports?
-                        'transform-object-rest-spread'
+                        '@babel/plugin-proposal-object-rest-spread',
+                        '@babel/plugin-transform-object-assign'
                     ],
-                    presets: ['es2015']
+                    presets: [
+                        [
+                            '@babel/preset-env',
+                            {
+                                useBuiltIns: false // false means polyfill not required runtime
+                            }
+                        ]
+                    ]
                 } // options
             }] // use
         }] // rules
     }, // module
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                parallel: true, // highly recommended
+                sourceMap: false
+            })
+        ]
+    },
     output: {
         path: outputPath,
         filename: '[name].js',
