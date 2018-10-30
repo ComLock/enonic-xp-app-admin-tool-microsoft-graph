@@ -10,7 +10,7 @@ import {
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (in jar file, resolved runtime)
 //──────────────────────────────────────────────────────────────────────────────
-//import {serviceUrl as getServiceUrl} from '/lib/xp/portal';
+import {serviceUrl as getServiceUrl} from '/lib/xp/portal';
 
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -45,11 +45,7 @@ const VIEW = [
                     '&nbsp;Microsoft Graph Admin'
                 ]),
                 h2('Services:'),
-                ul([
-                    li(a({
-                        href: null//getServiceUrl({service: 'token'}) // TODO Build issue
-                    }, 'token'))
-                ]),
+                ul(),
                 h2('com.enonic.app.admintool.microsoft.graph.cfg'),
             ])
         ])
@@ -57,13 +53,7 @@ const VIEW = [
 ];
 build(VIEW); // Build styling on static content
 
-
-const EXAMPLE = [
-    h2('Application configuration file syntax example'),
-    p('Replace anything marked with <>'),
-    pre(`<userStore>.client.id = <clientId>
-<userStore>.client.secret = <clientSecret>
-
+/*
 # * * * * * *
 # | | | | | |
 # | | | | | +-- Year              (range: 1900-3000)
@@ -76,15 +66,23 @@ const EXAMPLE = [
 # Once every night at 2:00
 <userStore>.cron = 0 2 * * * *
 
-
 <userStore>.delta = false,
+
+<userStore>.photo = true
+
+*/
+
+const EXAMPLE = [
+    h2('Application configuration file syntax example'),
+    p('Replace anything marked with <>'),
+    pre(`<userStore>.client.id = <clientId>
+<userStore>.client.secret = <clientSecret>
+
 <userStore>.host = https =//graph.microsoft.com
 
 <userStore>.mapping.displayName = displayName
 <userStore>.mapping.email = userPrincipalName
 <userStore>.mapping.name = mailNickname
-
-<userStore>.photo = true
 
 # No scope:
 <userStore>.profile.mapping.key = value
@@ -130,6 +128,20 @@ export function get() {
     Object.keys(app.config).sort().forEach((key) => {
         ordered[key] = app.config[key];
     });*/
+
+    access(dom, 'html.body.main.ul')
+        .addContent(li(a({
+            href: getServiceUrl({service: 'token'})
+        }, 'token')))
+        .addContent(li(a({
+            href: getServiceUrl({service: 'graph'})
+        }, 'graph')))
+        .addContent(li(a({
+            href: getServiceUrl({service: 'paginate'})
+        }, 'paginate')))
+        .addContent(li(a({
+            href: getServiceUrl({service: 'sync'})
+        }, 'sync')));
 
     access(dom, 'html.body.main')
         .addContent(pre(toStr(sortObject(deepen(app.config)))))
