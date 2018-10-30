@@ -4,7 +4,7 @@
 import {
     doctype, html, head, body, main, h1, h2, ul, li, a, pre, p, style,
     build, access, clone, render
-} from 'render-js/src/class.es';
+} from 'render-js/dist/class.js';
 
 
 //──────────────────────────────────────────────────────────────────────────────

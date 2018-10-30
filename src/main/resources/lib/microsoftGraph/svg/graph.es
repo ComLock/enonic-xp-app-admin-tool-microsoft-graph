@@ -1,4 +1,4 @@
-import {svg, path} from 'render-js/src/class.es';
+import {svg, path} from 'render-js/dist/class.js';
 
 
 export function graphSvg({
