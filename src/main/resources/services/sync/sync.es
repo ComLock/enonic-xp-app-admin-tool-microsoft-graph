@@ -90,6 +90,9 @@ function buildprofile({mapping, user}) {
 export function get(request) {
     const isMaster = getIsMaster();
     log.info(`service/sync.get() isMaster:${isMaster}`);
+    if (!isMaster()) {
+        return jsonError('You are only allowed to run this server on the active master node.');
+    }
 
     const context = getContext();
     log.debug(`service/sync.get() context:${toStr(context)}`);

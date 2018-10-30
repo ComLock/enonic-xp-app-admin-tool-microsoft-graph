@@ -8,5 +8,5 @@
     * * * * *
 -->
 <jobs>
-   <job name="sync" cron="0 * * * *"></job>
+   <job name="sync" cron="0 22 * * *"></job>
 </jobs>
