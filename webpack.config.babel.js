@@ -57,8 +57,8 @@ const SERVER_JS_CONFIG = {
         /\/lib\/(enonic|http-client|text-encoding|xp)/
     ],
     devtool: false, // Don't waste time generating sourceMaps
-    mode: 'production',
-    //mode: 'development',
+    mode: 'production', // This mangles function names, which can make error messages difficult to understand.
+    //mode: 'development', // So you this for debugging
     module: {
         rules: [{
             test: /\.(es6?|js)$/, // Will need js for node module depenencies
