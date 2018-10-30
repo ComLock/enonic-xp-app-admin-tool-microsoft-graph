@@ -92,10 +92,10 @@ export function get(request) {
     log.info(`service/sync.get() isMaster:${isMaster}`);
 
     const context = getContext();
-    log.info(`service/sync.get() context:${toStr(context)}`);
+    log.debug(`service/sync.get() context:${toStr(context)}`);
 
     const serviceUser = getUser();
-    log.info(`service/sync.get() serviceUser:${toStr(serviceUser)}`);
+    log.debug(`service/sync.get() serviceUser:${toStr(serviceUser)}`);
 
     const startTime = currentTimeMillis();
     const {userStore} = request.params;

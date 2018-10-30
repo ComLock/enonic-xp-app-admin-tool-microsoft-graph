@@ -35,7 +35,7 @@ export function get(request) {
         //log.info('service/graph.get() before getToken');
         const tokenResponse = getToken({params: { userStore }});
         //log.info('service/graph.get() after getToken');
-        log.debug(toStr({tokenResponse}));
+        //log.debug(toStr({tokenResponse}));
         authorization = `${tokenResponse.body.token_type} ${tokenResponse.body.access_token}`;
     }
     const path = request.params.path || 'v1.0';
