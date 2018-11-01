@@ -1,3 +1,6 @@
+//import cleanDeep from 'clean-deep'; // Cannot read property "__core-js_shared__" from undefined
+//import deepEqual from 'fast-deep-equal';
+
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (in jar file, resolved runtime)
 //──────────────────────────────────────────────────────────────────────────────
@@ -5,6 +8,7 @@ import {toStr} from '/lib/enonic/util';
 import {
     createUser,
     getPrincipal,
+    //getProfile,
     modifyProfile,
     modifyUser
 } from '/lib/xp/auth';
@@ -238,7 +242,6 @@ export function run(params) {
                     } // editor
                 });
 
-                //const currentProfile = getProfile({key}); log.debug(toStr({currentProfile}));
                 const newProfile = buildprofile({mapping: config.profile.mapping, user}); //log.debug(toStr({newProfile}));
 
                 if (config.resources) {
@@ -262,7 +265,13 @@ export function run(params) {
                     }
                 } // if config.resources
 
-                // TODO Perhaps use deepdiff, lets trust Enonic for now.
+                /*const currentProfile = getProfile({key}); // log.debug(toStr({currentProfile}));
+                const cleanedNewProfile = cleanDeep(newProfile);
+                if (deepEqual(currentProfile, cleanedNewProfile)) {
+                    log.info(toStr({equal: {currentProfile, cleanedNewProfile}}));
+                    users[user.userPrincipalName].profile = currentProfile;
+                } else {
+                    log.info(toStr({notEqual: {currentProfile, cleanedNewProfile}}));*/
                 const modifyProfileRes = modifyProfile({
                     key,
                     editor: () => newProfile /*(currentProfile) => { // eslint-disable-line no-unused-vars
@@ -273,6 +282,7 @@ export function run(params) {
                 });
                 log.info(toStr({modifyProfileRes}));
                 users[user.userPrincipalName].profile = modifyProfileRes; //getProfile({key});
+                //}
             } catch (e) {
                 log.error(`Something went wrong while processing user:${key} e:${e}`);
             }
