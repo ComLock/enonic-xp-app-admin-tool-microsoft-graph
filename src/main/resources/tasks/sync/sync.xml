@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<task>
+    <description>Sync</description>
+    <config>
+        <input name="userStore" type="Textline">
+            <label>Userstore</label>
+            <occurrences minimum="1" maximum="1"/>
+        </input>
+    </config>
+</task>
