@@ -219,6 +219,14 @@ export function run(params) {
                     const createRes = createUser(createUserParams);
                     log.info(toStr({createRes}));
                     users[user.userPrincipalName] = createRes;
+                    const beforeRefreshMs = currentTimeMillis();
+                    connection.refresh();
+                    const afterRefreshMs = currentTimeMillis();
+                    log.info(toStr({
+                        beforeRefreshMs,
+                        afterRefreshMs,
+                        durationRefreshMs: afterRefreshMs - beforeRefreshMs
+                    }));
                 } // if !principal
 
                 connection.modify({
