@@ -125,8 +125,6 @@ export function run(params) {
     }, () => {
         //if (isAlreadyRunning()) { return; }
 
-        const startTime = currentTimeMillis();
-
         //log.info(toStr({params}));
         const {userStore} = params;
         if (!userStore) {
@@ -137,6 +135,14 @@ export function run(params) {
             });
             return;
         }
+        const startTime = currentTimeMillis();
+        connection.refresh();
+        const afterFirstRefreshMs = currentTimeMillis();
+        log.info(toStr({
+            startTime,
+            afterFirstRefreshMs,
+            durationRefreshMs: afterFirstRefreshMs - startTime
+        }));
 
         const config = deepen(app.config)[userStore]; //log.info(toStr({config: sortObject(config)}));
         const select = ['userPrincipalName']; // userPrincipalName is used in resource requests
@@ -295,6 +301,15 @@ export function run(params) {
                 log.error(`Something went wrong while processing user:${key} e:${e}`);
             }
         }); // forEach user
+
+        const beforeLastRefreshMs = currentTimeMillis();
+        connection.refresh();
+        const afterLastRefreshMs = currentTimeMillis();
+        log.info(toStr({
+            beforeLastRefreshMs,
+            afterLastRefreshMs,
+            durationRefreshMs: afterLastRefreshMs - beforeLastRefreshMs
+        }));
 
         progress({
             current,
