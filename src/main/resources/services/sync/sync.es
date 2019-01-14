@@ -63,7 +63,8 @@ const userStoreInput = ({
 const missingUserStoreParamResponse = htmlResponse({
 	main: `<form>${userStoreInput()}<button type="submit">Submit</button</form>`,
 	messages: ['Url parameter userStore must be present!'],
-	status: 400
+	status: 400,
+	title: 'Sync service'
 });
 
 
@@ -92,7 +93,8 @@ export function get({
 	${userStoreInput({value: userStore})}
 	<button formmethod="get">Status</button>
 	<button formmethod="post">Start</button>
-</form><samp>${sampInnerHtml}</samp>`
+</form><samp>${sampInnerHtml}</samp>`,
+		title: `Sync userStore ${userStore}`
 	});
 } // get
 
@@ -101,7 +103,7 @@ export const post = ({
 	params: { userStore }
 }) => {
 	const isMaster = getIsMaster();
-	if (isMaster) {
+	if (!isMaster) {
 		return jsonError('You are only allowed to run this server on the active master node.');
 	}
 
@@ -113,7 +115,7 @@ export const post = ({
 		}
 	});
 	return get({
-		params: userStore
+		params: { userStore }
 	}, {
 		isMaster,
 		taskId

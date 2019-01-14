@@ -2,7 +2,7 @@ export const htmlResponse = ({
 	main = '',
 	messages = [],
 	status,
-	title
+	title = ''
 } = {}) => ({
 	body: `<html>
 	<head>
